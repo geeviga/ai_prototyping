@@ -1,0 +1,370 @@
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
+<script>
+const e=React.createElement;
+const CHAINS=[
+{id:1,start:"Number 8",difficulty:"medium",rounds:[
+{correct:[{obj:"Octopus",why:"Has exactly 8 arms"},{obj:"Spider",why:"Has exactly 8 legs"},{obj:"Oxygen",why:"Atomic number is 8"}],wild:{obj:"Rainbow",why:"Has 7 colors, not 8"}},
+{from:"Octopus",correct:[{obj:"Ink",why:"Squirts ink to escape predators"},{obj:"Camouflage",why:"Master of disguise"},{obj:"Three Hearts",why:"Has 3 separate hearts"}],wild:{obj:"Dolphin",why:"Both swim, but no unique connection"}},
+{from:"Ink",correct:[{obj:"Printing Press",why:"Gutenberg revolutionized books"},{obj:"Squid",why:"Another ink-producing creature"},{obj:"Tattoo",why:"Permanent ink art"}],wild:{obj:"Pencil",why:"Uses graphite, not ink"}},
+{from:"Printing Press",correct:[{obj:"Bible",why:"First major printed book"},{obj:"Renaissance",why:"Sparked information revolution"},{obj:"Newspaper",why:"Mass media born from printing"}],wild:{obj:"Television",why:"Came 500 years later"}},
+{from:"Renaissance",correct:[{obj:"Leonardo da Vinci",why:"Ultimate Renaissance polymath"},{obj:"Florence",why:"Birthplace of the movement"},{obj:"Humanism",why:"Core philosophy of the era"}],wild:{obj:"Industrial Revolution",why:"Different era entirely"}},
+{from:"Leonardo da Vinci",correct:[{obj:"Mona Lisa",why:"His most famous painting"},{obj:"Flying Machine",why:"Designed early aircraft"},{obj:"Vitruvian Man",why:"Famous proportion study"}],wild:{obj:"Sistine Chapel",why:"Painted by Michelangelo"}},
+{from:"Vitruvian Man",correct:[{obj:"Golden Ratio",why:"Based on ideal proportions"},{obj:"Human Anatomy",why:"Study of perfect form"},{obj:"Circle",why:"Man inscribed in circle"}],wild:{obj:"Statue",why:"It's a drawing, not sculpture"}},
+{from:"Golden Ratio",correct:[{obj:"Nautilus Shell",why:"Spiral follows the ratio"},{obj:"Fibonacci",why:"Sequence approaches ratio"},{obj:"Parthenon",why:"Architecture uses it"}],wild:{obj:"Pi",why:"Different constant entirely"}},
+{from:"Nautilus Shell",correct:[{obj:"Spiral",why:"Grows in logarithmic spiral"},{obj:"Deep Ocean",why:"Lives in ocean depths"},{obj:"Fossil",why:"Living fossil, unchanged millions of years"}],wild:{obj:"Hermit Crab",why:"Uses shells but doesn't grow them"}},
+{from:"Spiral",correct:[{obj:"Galaxy",why:"Milky Way is spiral-shaped"},{obj:"DNA",why:"The double helix"},{obj:"Hurricane",why:"Storms spin in spirals"}],wild:{obj:"Orbit",why:"Orbits are elliptical, not spiral"}}
+]},
+{id:2,start:"Honey",difficulty:"medium",rounds:[
+{correct:[{obj:"Bee",why:"Bees produce honey"},{obj:"Bear",why:"Famous honey lover"},{obj:"Ancient Egypt",why:"Honey found in tombs, still edible"}],wild:{obj:"Sugar",why:"Different sweetener, no direct link"}},
+{from:"Bee",correct:[{obj:"Hexagon",why:"Honeycomb cells are hexagonal"},{obj:"Queen",why:"Colony ruled by queen bee"},{obj:"Pollination",why:"Critical for plant reproduction"}],wild:{obj:"Butterfly",why:"Both insects, but different roles"}},
+{from:"Hexagon",correct:[{obj:"Snowflake",why:"All snowflakes are hexagonal"},{obj:"Benzene",why:"Hexagonal molecular structure"},{obj:"Soccer Ball",why:"Made of hexagons and pentagons"}],wild:{obj:"Stop Sign",why:"Stop signs are octagons (8 sides)"}},
+{from:"Snowflake",correct:[{obj:"Crystal",why:"Snowflakes are ice crystals"},{obj:"Unique",why:"No two are alike"},{obj:"Wilson Bentley",why:"First to photograph snowflakes"}],wild:{obj:"Rain",why:"Different form of precipitation"}},
+{from:"Crystal",correct:[{obj:"Quartz",why:"Most common crystal"},{obj:"Radio",why:"Crystal radios use quartz"},{obj:"Fortune Telling",why:"Crystal balls in divination"}],wild:{obj:"Diamond",why:"Diamond is carbon, not crystal structure focus"}},
+{from:"Quartz",correct:[{obj:"Watch",why:"Quartz vibrations keep time"},{obj:"Silicon",why:"Quartz is silicon dioxide"},{obj:"Piezoelectric",why:"Generates electricity under pressure"}],wild:{obj:"Gold",why:"Different mineral entirely"}},
+{from:"Watch",correct:[{obj:"Switzerland",why:"Famous for watchmaking"},{obj:"Wrist",why:"Wristwatches revolutionized timekeeping"},{obj:"Spring",why:"Mechanical watches use mainspring"}],wild:{obj:"Clock Tower",why:"Different scale, not same innovation"}},
+{from:"Switzerland",correct:[{obj:"Alps",why:"Mountain range spans country"},{obj:"Chocolate",why:"Famous Swiss export"},{obj:"Neutrality",why:"Neutral in world wars"}],wild:{obj:"Sweden",why:"Different country entirely"}},
+{from:"Alps",correct:[{obj:"Hannibal",why:"Crossed Alps with elephants"},{obj:"Matterhorn",why:"Iconic Alpine peak"},{obj:"Skiing",why:"Birthplace of alpine skiing"}],wild:{obj:"Himalayas",why:"Different mountain range"}},
+{from:"Hannibal",correct:[{obj:"Elephant",why:"Army included war elephants"},{obj:"Carthage",why:"General of Carthage"},{obj:"Rome",why:"Carthage's greatest enemy"}],wild:{obj:"Alexander",why:"Different era and empire"}}
+]},
+{id:3,start:"Apple",difficulty:"easy",rounds:[
+{correct:[{obj:"Newton",why:"Apple fell, inspired gravity theory"},{obj:"Snow White",why:"Poisoned apple in fairy tale"},{obj:"Steve Jobs",why:"Co-founded Apple Inc."}],wild:{obj:"Orange",why:"Just another fruit"}},
+{from:"Newton",correct:[{obj:"Gravity",why:"Discovered gravitational laws"},{obj:"Calculus",why:"Co-invented calculus"},{obj:"Prism",why:"Split light into spectrum"}],wild:{obj:"Einstein",why:"Different physicist, different era"}},
+{from:"Gravity",correct:[{obj:"Moon",why:"Gravity keeps moon in orbit"},{obj:"Tides",why:"Moon's gravity causes tides"},{obj:"Black Hole",why:"Extreme gravitational pull"}],wild:{obj:"Magnetism",why:"Different force entirely"}},
+{from:"Moon",correct:[{obj:"Apollo",why:"Apollo missions landed there"},{obj:"Werewolf",why:"Full moon transforms werewolves"},{obj:"Cheese",why:"'Made of cheese' in folklore"}],wild:{obj:"Sun",why:"Star, not satellite"}},
+{from:"Apollo",correct:[{obj:"NASA",why:"Space agency ran Apollo"},{obj:"Armstrong",why:"First man on moon"},{obj:"Saturn V",why:"Rocket that launched missions"}],wild:{obj:"SpaceX",why:"Modern company, not Apollo era"}},
+{from:"NASA",correct:[{obj:"Houston",why:"Mission Control location"},{obj:"Hubble",why:"Famous NASA telescope"},{obj:"Mars Rover",why:"NASA's Mars exploration"}],wild:{obj:"ESA",why:"European agency, not NASA"}},
+{from:"Houston",correct:[{obj:"Texas",why:"City in Texas"},{obj:"Oil",why:"Oil industry capital"},{obj:"Astros",why:"Baseball team"}],wild:{obj:"Dallas",why:"Different Texas city"}},
+{from:"Texas",correct:[{obj:"Alamo",why:"Famous battle site"},{obj:"Cowboys",why:"NFL team and culture"},{obj:"BBQ",why:"Famous Texas cuisine"}],wild:{obj:"California",why:"Different state"}},
+{from:"Alamo",correct:[{obj:"Davy Crockett",why:"Died defending Alamo"},{obj:"Mexico",why:"Battle for Texas independence"},{obj:"Remember",why:"'Remember the Alamo' motto"}],wild:{obj:"Gettysburg",why:"Civil War battle, different conflict"}},
+{from:"Davy Crockett",correct:[{obj:"Coonskin Cap",why:"His iconic headwear"},{obj:"Tennessee",why:"'King of the Wild Frontier'"},{obj:"Congress",why:"Served in U.S. Congress"}],wild:{obj:"Daniel Boone",why:"Different frontiersman"}}
+]},
+{id:4,start:"Chess",difficulty:"hard",rounds:[
+{correct:[{obj:"King",why:"Most important piece"},{obj:"India",why:"Game originated there"},{obj:"Kasparov",why:"Legendary grandmaster"}],wild:{obj:"Checkers",why:"Different board game"}},
+{from:"King",correct:[{obj:"Crown",why:"Symbol of monarchy"},{obj:"Elvis",why:"'The King' of rock"},{obj:"Playing Cards",why:"King is highest card"}],wild:{obj:"President",why:"Elected, not crowned"}},
+{from:"Crown",correct:[{obj:"Jewels",why:"Crown jewels are treasures"},{obj:"Tooth",why:"Dental crown"},{obj:"Corona",why:"Latin for crown, also virus"}],wild:{obj:"Hat",why:"Not a crown specifically"}},
+{from:"Jewels",correct:[{obj:"Heist",why:"Famous jewel heists"},{obj:"Cartier",why:"Luxury jewelry brand"},{obj:"Hope Diamond",why:"Famous cursed diamond"}],wild:{obj:"Gold",why:"Metal, not jewel"}},
+{from:"Hope Diamond",correct:[{obj:"Smithsonian",why:"Where it's displayed"},{obj:"Curse",why:"Legendarily cursed gem"},{obj:"Blue",why:"Famous blue color"}],wild:{obj:"Koh-i-Noor",why:"Different famous diamond"}},
+{from:"Smithsonian",correct:[{obj:"Washington DC",why:"Museum location"},{obj:"Donation",why:"Founded by donation"},{obj:"Ruby Slippers",why:"Houses Wizard of Oz shoes"}],wild:{obj:"Louvre",why:"Different museum, Paris"}},
+{from:"Washington DC",correct:[{obj:"Capitol",why:"Congress building"},{obj:"Cherry Blossoms",why:"Famous spring bloom"},{obj:"Monument",why:"Washington Monument"}],wild:{obj:"New York",why:"Different city"}},
+{from:"Capitol",correct:[{obj:"Dome",why:"Iconic domed roof"},{obj:"Congress",why:"Where Congress meets"},{obj:"January 6",why:"2021 events"}],wild:{obj:"White House",why:"President's residence, not Congress"}},
+{from:"Congress",correct:[{obj:"Senate",why:"Upper chamber"},{obj:"Bill",why:"Passes bills into law"},{obj:"Filibuster",why:"Delay tactic"}],wild:{obj:"Parliament",why:"British system, not American"}},
+{from:"Senate",correct:[{obj:"Rome",why:"Roman Senate was original"},{obj:"100",why:"100 U.S. senators"},{obj:"Toga",why:"Roman senators wore togas"}],wild:{obj:"House",why:"Different chamber of Congress"}}
+]},
+{id:5,start:"Coffee",difficulty:"medium",rounds:[
+{correct:[{obj:"Ethiopia",why:"Coffee originated there"},{obj:"Caffeine",why:"Active stimulant"},{obj:"Bean",why:"Made from coffee beans"}],wild:{obj:"Tea",why:"Different beverage entirely"}},
+{from:"Ethiopia",correct:[{obj:"Lucy",why:"Famous fossil found there"},{obj:"Nile",why:"Blue Nile starts there"},{obj:"Marathon",why:"Famous Ethiopian runners"}],wild:{obj:"Kenya",why:"Neighboring but different country"}},
+{from:"Lucy",correct:[{obj:"Fossil",why:"3.2 million year old fossil"},{obj:"Beatles",why:"Named after Beatles song"},{obj:"Australopithecus",why:"Her species name"}],wild:{obj:"Evolution",why:"Too broad a concept"}},
+{from:"Beatles",correct:[{obj:"Liverpool",why:"Band's hometown"},{obj:"Abbey Road",why:"Famous album/crossing"},{obj:"Lennon",why:"Band member John Lennon"}],wild:{obj:"Rolling Stones",why:"Different band"}},
+{from:"Abbey Road",correct:[{obj:"Crosswalk",why:"Iconic album cover"},{obj:"Studio",why:"Famous recording studio"},{obj:"Barefoot",why:"Paul barefoot sparked rumors"}],wild:{obj:"London Bridge",why:"Different London landmark"}},
+{from:"Crosswalk",correct:[{obj:"Zebra",why:"Called zebra crossing in UK"},{obj:"Pedestrian",why:"For pedestrian safety"},{obj:"Signal",why:"Walk/don't walk signals"}],wild:{obj:"Intersection",why:"Too general"}},
+{from:"Zebra",correct:[{obj:"Stripes",why:"Distinctive black and white"},{obj:"Africa",why:"Native to Africa"},{obj:"Herd",why:"Lives in herds"}],wild:{obj:"Horse",why:"Related but not the link"}},
+{from:"Stripes",correct:[{obj:"Barcode",why:"Made of stripes"},{obj:"Prison",why:"Classic prison uniform"},{obj:"American Flag",why:"Stars and stripes"}],wild:{obj:"Polka Dots",why:"Different pattern"}},
+{from:"Barcode",correct:[{obj:"Scanner",why:"Scanned at checkout"},{obj:"Wrigley's Gum",why:"First product scanned"},{obj:"Inventory",why:"Track inventory"}],wild:{obj:"QR Code",why:"Different code type"}},
+{from:"Scanner",correct:[{obj:"Laser",why:"Uses laser light"},{obj:"MRI",why:"Medical body scanner"},{obj:"Digitize",why:"Converts to digital"}],wild:{obj:"Printer",why:"Outputs, doesn't scan"}}
+]}
+];
+
+const shuffle=arr=>{const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const today=new Date().toDateString();
+const savedData=JSON.parse(localStorage.getItem('links_game')||'{}');
+const todayPlayed=savedData.date===today;
+const chainIndex=savedData.date===today?savedData.chainIndex:Math.floor(Math.random()*CHAINS.length);
+
+const App=()=>{
+const[screen,setScreen]=React.useState(todayPlayed?'already':'tutorial');
+const[tutStep,setTutStep]=React.useState(0);
+const[round,setRound]=React.useState(0);
+const[score,setScore]=React.useState(todayPlayed?savedData.score:0);
+const[chain]=React.useState(CHAINS[chainIndex]);
+const[currentObj,setCurrentObj]=React.useState(chain.start);
+const[timer,setTimer]=React.useState(30);
+const[selected,setSelected]=React.useState(null);
+const[showResult,setShowResult]=React.useState(false);
+const[isCorrect,setIsCorrect]=React.useState(false);
+const[options,setOptions]=React.useState([]);
+const[history,setHistory]=React.useState([chain.start]);
+const[correctAns,setCorrectAns]=React.useState(null);
+const[animPulse,setAnimPulse]=React.useState(false);
+const[streak]=React.useState(savedData.streak||0);
+const timerRef=React.useRef(null);
+
+React.useEffect(()=>{
+if(screen==='playing'&&timer>0&&!showResult){
+timerRef.current=setTimeout(()=>setTimer(t=>t-1),1000);
+return()=>clearTimeout(timerRef.current);
+}
+if(timer===0&&screen==='playing'&&!showResult)handleTimeout();
+},[timer,screen,showResult]);
+
+React.useEffect(()=>{
+if(screen==='playing'&&!showResult&&round<chain.rounds.length){
+const r=chain.rounds[round];
+const mainCorrect=r.correct[Math.floor(Math.random()*r.correct.length)];
+setCorrectAns(mainCorrect);
+let opts=[{...mainCorrect,isCorrect:true},{...r.wild,isCorrect:false}];
+const others=shuffle(r.correct.filter(c=>c.obj!==mainCorrect.obj)).slice(0,2);
+others.forEach(o=>opts.push({...o,isCorrect:true}));
+setOptions(shuffle(opts));
+}
+},[round,screen,showResult]);
+
+const handleTimeout=()=>{setIsCorrect(false);setShowResult(true);};
+const handleSelect=(opt,idx)=>{
+if(showResult)return;
+clearTimeout(timerRef.current);
+setSelected(idx);
+setAnimPulse(true);
+setTimeout(()=>setAnimPulse(false),300);
+const correct=opt.isCorrect;
+setIsCorrect(correct);
+setShowResult(true);
+if(correct){setScore(s=>s+1);setHistory(h=>[...h,opt.obj]);}
+};
+const nextRound=()=>{
+if(!isCorrect||round>=9){
+const finalScore=isCorrect?score+1:score;
+const newStreak=finalScore===10?(streak+1):0;
+localStorage.setItem('links_game',JSON.stringify({date:today,chainIndex,score:finalScore,streak:newStreak,history}));
+setScreen('result');
+if(finalScore===10)triggerCelebration();
+return;
+}
+setCurrentObj(options[selected].obj);
+setRound(r=>r+1);
+setTimer(30);
+setSelected(null);
+setShowResult(false);
+};
+const triggerCelebration=()=>{
+const end=Date.now()+4000;
+const colors=['#50abf6','#8acb5e','#f7b15b','#fc97b8','#c8a9fc','#73d4da'];
+const frame=()=>{
+confetti({particleCount:7,angle:60,spread:70,origin:{x:0},colors});
+confetti({particleCount:7,angle:120,spread:70,origin:{x:1},colors});
+if(Date.now()<end)requestAnimationFrame(frame);
+};frame();
+};
+const getPct=()=>Math.round((score/10)*100);
+const getMedal=()=>{
+const p=getPct();
+if(p===100)return{i:'🏆',l:'PERFECT!',c:'#f7b15b'};
+if(p>=80)return{i:'🥇',l:'Gold',c:'#f7b15b'};
+if(p>=50)return{i:'🥈',l:'Silver',c:'#c0c0c0'};
+return{i:'🥉',l:'Bronze',c:'#cd7f32'};
+};
+
+const s={
+wrap:{maxWidth:402,margin:'0 auto',fontFamily:'system-ui,-apple-system,sans-serif',background:'#f6f3ed',minHeight:560,borderRadius:16,overflow:'hidden',border:'1.25px solid #0a0a0b',position:'relative'},
+head:{background:'#50abf6',padding:'12px 16px',borderBottom:'2px solid #0a0a0b',display:'flex',justifyContent:'space-between',alignItems:'center'},
+logo:{display:'flex',alignItems:'center',gap:8},
+title:{margin:0,fontSize:20,fontWeight:700,color:'#0a0a0b'},
+badge:{background:'#fff',border:'1.3px solid #0a0a0b',borderRadius:4,padding:'3px 8px',fontSize:12,fontWeight:600},
+body:{padding:'16px 20px'},
+card:{background:'#50abf6',border:'2px solid #0a0a0b',borderBottomWidth:4,borderRadius:14,padding:16,textAlign:'center',transition:'transform 0.2s'},
+cardPulse:{transform:'scale(1.02)'},
+cardLbl:{fontSize:10,fontWeight:700,color:'#0a0a0b',opacity:0.6,marginBottom:2,textTransform:'uppercase',letterSpacing:1.5},
+cardTxt:{fontSize:24,fontWeight:700,color:'#0a0a0b',margin:0,fontFamily:'Georgia,serif'},
+timerWrap:{display:'flex',alignItems:'center',gap:10,marginBottom:14},
+timerBar:{flex:1,height:6,background:'#e4ded3',borderRadius:3,overflow:'hidden'},
+timerFill:{height:'100%',transition:'width 0.3s ease'},
+timerNum:{fontSize:13,fontWeight:700,minWidth:32,textAlign:'right'},
+chainTrack:{display:'flex',alignItems:'center',gap:6,marginBottom:14,overflowX:'auto',paddingBottom:4},
+chainItem:{background:'#73d4da',border:'1.5px solid #0a0a0b',borderRadius:6,padding:'4px 10px',fontSize:11,fontWeight:600,whiteSpace:'nowrap',flexShrink:0},
+chainArrow:{fontSize:12,color:'#0a0a0b',flexShrink:0},
+chainNext:{background:'#ede7db',border:'1.5px dashed #0a0a0b'},
+optBtn:{width:'100%',padding:'12px 14px',marginBottom:8,background:'#fff',border:'2px solid #0a0a0b',borderBottomWidth:3,borderRadius:10,fontSize:15,fontWeight:600,cursor:'pointer',textAlign:'left',transition:'all 0.15s',display:'flex',justifyContent:'space-between',alignItems:'center'},
+optHover:{background:'#f0f0f0'},
+optOk:{background:'#8acb5e',borderColor:'#0a0a0b'},
+optBad:{background:'#e78447',borderColor:'#0a0a0b'},
+optMuted:{background:'#d4edda'},
+explain:{background:'#fff',border:'2px solid #0a0a0b',borderRadius:10,padding:12,marginTop:10,fontSize:13,lineHeight:1.5},
+btn:{width:'100%',padding:'12px',background:'#0a0a0b',color:'#f6f3ed',border:'none',borderRadius:40,fontSize:15,fontWeight:600,cursor:'pointer',marginTop:14,transition:'transform 0.1s'},
+btnAlt:{background:'#50abf6',color:'#0a0a0b',border:'2px solid #0a0a0b'},
+btnGhost:{background:'transparent',color:'#0a0a0b',border:'2px solid #0a0a0b'},
+center:{textAlign:'center',padding:'24px 20px'},
+tutCard:{background:'#fff',border:'2px solid #0a0a0b',borderBottomWidth:4,borderRadius:14,padding:16,marginBottom:14},
+dots:{display:'flex',justifyContent:'center',gap:6,marginBottom:16},
+dot:{width:8,height:8,borderRadius:4},
+progDots:{display:'flex',justifyContent:'center',gap:5,marginBottom:16,flexWrap:'wrap'},
+progDot:{width:24,height:24,borderRadius:5,border:'1.5px solid #0a0a0b',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700},
+progOk:{background:'#8acb5e'},
+progBad:{background:'#e78447'},
+progEmpty:{background:'#e4ded3'},
+medal:{fontSize:56,marginBottom:4},
+resultTitle:{fontSize:24,fontWeight:700,margin:'0 0 4px'},
+resultSub:{fontSize:15,opacity:0.8,fontFamily:'Georgia,serif',margin:'0 0 16px'},
+historyBox:{background:'#fff',border:'1.5px solid #0a0a0b',borderRadius:10,padding:12,marginBottom:16,textAlign:'left'},
+historyLbl:{fontSize:10,fontWeight:700,opacity:0.6,marginBottom:6,textTransform:'uppercase'},
+historyChain:{display:'flex',flexWrap:'wrap',gap:4,alignItems:'center'},
+shareBtn:{background:'#50abf6',border:'2px solid #0a0a0b',borderRadius:40,padding:'10px 20px',fontSize:14,fontWeight:600,cursor:'pointer'},
+footer:{fontSize:11,opacity:0.5,marginTop:16},
+streakBadge:{background:'#f7b15b',border:'1.5px solid #0a0a0b',borderRadius:20,padding:'2px 10px',fontSize:11,fontWeight:700,display:'inline-flex',alignItems:'center',gap:4}
+};
+
+// ALREADY PLAYED TODAY
+if(screen==='already'){
+const m=getMedal();
+return e('div',{style:s.wrap},
+e('div',{style:s.head},
+e('div',{style:s.logo},e('span',{style:{fontSize:20}},'🔗'),e('h1',{style:s.title},'Links')),
+e('span',{style:s.badge},'Daily')
+),
+e('div',{style:s.center},
+e('div',{style:{fontSize:48,marginBottom:8}},'✅'),
+e('h2',{style:{fontSize:20,margin:'0 0 8px'}},"You've played today!"),
+e('p',{style:{fontSize:14,opacity:0.7,margin:'0 0 20px'}},'Come back tomorrow for a new chain.'),
+e('div',{style:{...s.historyBox,textAlign:'center'}},
+e('div',{style:s.historyLbl},'Your result'),
+e('div',{style:{fontSize:36,marginBottom:4}},m.i),
+e('div',{style:{fontSize:16,fontWeight:600}},`${savedData.score*10}%`),
+streak>0&&e('div',{style:{...s.streakBadge,marginTop:8}},'🔥',streak,' day streak')
+),
+e('p',{style:s.footer},'🔔 New puzzle at midnight')
+)
+);
+}
+
+// TUTORIAL
+if(screen==='tutorial'){
+const tuts=[
+{title:"Build the Chain",body:e('div',null,
+e('p',{style:{fontSize:14,lineHeight:1.6,marginBottom:12}},"Connect concepts through surprising but logical links. Each object leads to the next."),
+e('div',{style:s.chainTrack},
+['Number 8','Octopus','Ink','Printing Press','?'].map((t,i,a)=>e(React.Fragment,{key:i},
+e('span',{style:{...s.chainItem,...(t==='?'?s.chainNext:{})}},t),
+i<a.length-1&&e('span',{style:s.chainArrow},'→')
+))
+),
+e('p',{style:{fontSize:12,opacity:0.6,marginTop:8}},'8 arms → squirts ink → Gutenberg...')
+)},
+{title:"Spot the Wildcard",body:e('div',null,
+e('p',{style:{fontSize:14,lineHeight:1.6,marginBottom:12}},"Three options connect. One wildcard breaks the chain."),
+e('div',{style:{...s.card,padding:10,marginBottom:10}},e('div',{style:{...s.cardTxt,fontSize:18}},'Octopus')),
+e('div',{style:{display:'flex',flexDirection:'column',gap:6}},
+e('div',{style:{...s.optBtn,...s.optOk,marginBottom:0,padding:10}},'✓ Ink',e('span',{style:{fontSize:11,opacity:0.7}},'squirts ink')),
+e('div',{style:{...s.optBtn,marginBottom:0,padding:10,opacity:0.6}},'Camouflage'),
+e('div',{style:{...s.optBtn,marginBottom:0,padding:10,opacity:0.6}},'Three Hearts'),
+e('div',{style:{...s.optBtn,...s.optBad,marginBottom:0,padding:10}},'✗ Dolphin',e('span',{style:{fontSize:11,opacity:0.7}},'too generic'))
+)
+)},
+{title:"Beat the Clock",body:e('div',null,
+e('p',{style:{fontSize:14,lineHeight:1.6,marginBottom:12}},"30 seconds per link. Complete all 10 to win!"),
+e('div',{style:{display:'flex',gap:6,justifyContent:'center',marginBottom:12,flexWrap:'wrap'}},
+e('span',{style:{...s.badge,background:'#cd7f32',color:'#fff'}},'🥉 <50%'),
+e('span',{style:{...s.badge,background:'#c0c0c0'}},'🥈 50-79%'),
+e('span',{style:{...s.badge,background:'#f7b15b'}},'🥇 80-99%'),
+e('span',{style:{...s.badge,background:'#f7b15b'}},'🏆 100%')
+),
+e('p',{style:{fontSize:12,opacity:0.6}},'Think laterally—history, wordplay, science!')
+)}
+];
+const t=tuts[tutStep];
+return e('div',{style:s.wrap},
+e('div',{style:s.head},
+e('div',{style:s.logo},e('span',{style:{fontSize:20}},'🔗'),e('h1',{style:s.title},'Links')),
+e('span',{style:s.badge},'How to Play')
+),
+e('div',{style:s.body},
+e('div',{style:s.tutCard},
+e('h3',{style:{margin:'0 0 10px',fontSize:16,fontWeight:700}},t.title),
+t.body
+),
+e('div',{style:s.dots},[0,1,2].map(i=>e('div',{key:i,style:{...s.dot,background:i===tutStep?'#0a0a0b':'#d4ded3'}}))),
+e('button',{style:s.btn,onClick:()=>tutStep<2?setTutStep(tutStep+1):setScreen('playing')},tutStep<2?'Next →':'Start Game →'),
+tutStep>0&&e('button',{style:{...s.btn,...s.btnGhost,marginTop:8},onClick:()=>setTutStep(tutStep-1)},'← Back')
+)
+);
+}
+
+// PLAYING
+if(screen==='playing'){
+const timerPct=(timer/30)*100;
+const timerColor=timer>10?'#8acb5e':timer>5?'#f7b15b':'#e78447';
+return e('div',{style:s.wrap},
+e('div',{style:s.head},
+e('div',{style:s.logo},e('span',{style:{fontSize:20}},'🔗'),e('h1',{style:{...s.title,fontSize:18}},'Links')),
+e('div',{style:{display:'flex',gap:6}},
+e('span',{style:s.badge},`${round+1}/10`),
+e('span',{style:{...s.badge,background:timerColor,color:timer<=5?'#fff':'#0a0a0b'}},`${timer}s`)
+)
+),
+e('div',{style:s.body},
+e('div',{style:s.timerWrap},
+e('div',{style:s.timerBar},e('div',{style:{...s.timerFill,width:`${timerPct}%`,background:timerColor}})),
+),
+e('div',{style:s.chainTrack},
+history.slice(-3).map((h,i,a)=>e(React.Fragment,{key:i},
+e('span',{style:s.chainItem},h),
+e('span',{style:s.chainArrow},'→')
+)),
+e('span',{style:{...s.chainItem,...s.chainNext}},'?')
+),
+e('div',{style:{...s.card,...(animPulse?s.cardPulse:{})}},
+e('div',{style:s.cardLbl},'Find what links to'),
+e('div',{style:s.cardTxt},currentObj)
+),
+e('p',{style:{fontSize:12,fontWeight:600,margin:'12px 0 8px',color:'#0a0a0b'}},'Select the next link:'),
+options.map((opt,idx)=>{
+let st={...s.optBtn};
+if(showResult){
+if(selected===idx)st=opt.isCorrect?{...st,...s.optOk}:{...st,...s.optBad};
+else if(opt.isCorrect&&!isCorrect)st={...st,...s.optMuted};
+}
+return e('button',{key:idx,style:st,onClick:()=>handleSelect(opt,idx),disabled:showResult},
+opt.obj,
+showResult&&selected===idx&&e('span',{style:{fontSize:18}},opt.isCorrect?'✓':'✗')
+);
+}),
+showResult&&e('div',{style:s.explain},
+isCorrect?e('span',null,e('strong',null,'✅ Correct! '),options[selected].why):
+e('span',null,e('strong',null,'❌ Chain broken! '),'The link was "',correctAns.obj,'" — ',correctAns.why)
+),
+showResult&&e('button',{style:s.btn,onClick:nextRound},isCorrect?(round>=9?'See Results →':'Continue →'):'See Results →')
+)
+);
+}
+
+// RESULTS
+if(screen==='result'){
+const m=getMedal();
+const pct=getPct();
+const finalHistory=history;
+return e('div',{style:s.wrap},
+e('div',{style:{...s.head,background:m.c}},
+e('div',{style:s.logo},e('span',{style:{fontSize:20}},'🔗'),e('h1',{style:{...s.title,fontSize:18}},'Links')),
+e('span',{style:s.badge},'Complete')
+),
+e('div',{style:s.center},
+e('div',{style:s.medal},m.i),
+e('h2',{style:s.resultTitle},pct===100?'PERFECT CHAIN!':m.l+'!'),
+e('p',{style:s.resultSub},pct===100?'Every link connected!':pct>0?`${pct}% complete`:'Try again tomorrow!'),
+e('div',{style:s.progDots},
+Array.from({length:10}).map((_,i)=>e('div',{key:i,style:{...s.progDot,...(i<score?s.progOk:i===score&&!isCorrect?s.progBad:s.progEmpty)}},
+i<score?'✓':i===score&&!isCorrect?'✗':''
+))
+),
+e('div',{style:s.historyBox},
+e('div',{style:s.historyLbl},'Your chain'),
+e('div',{style:s.historyChain},
+finalHistory.map((h,i)=>e(React.Fragment,{key:i},
+e('span',{style:{...s.chainItem,fontSize:10,padding:'3px 7px'}},h),
+i<finalHistory.length-1&&e('span',{style:{...s.chainArrow,fontSize:10}},'→')
+))
+)
+),
+e('button',{style:s.shareBtn,onClick:()=>{
+const txt=`🔗 Links ${m.i} ${pct}%\n${finalHistory.join(' → ')}\n${'🟦'.repeat(score)}${'⬜'.repeat(10-score)}`;
+if(navigator.share)navigator.share({text:txt});
+else{navigator.clipboard.writeText(txt);alert('Copied!');}
+}},'Share 📤'),
+e('p',{style:s.footer},'🔔 New puzzle tomorrow at midnight')
+)
+);
+}
+return null;
+};
+ReactDOM.createRoot(document.getElementById('root')).render(e(App));
+</script>
