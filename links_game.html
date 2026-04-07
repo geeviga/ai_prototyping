@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Links – Connect the Map</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream-500: #f6f3ed;
+      --cream-600: #ede7db;
+      --cream-700: #e4ded3;
+      --black-500: #0a0a0b;
+      --white: #ffffff;
+      --blue: #50abf6;
+      --teal: #73d4da;
+      --green: #8acb5e;
+      --orange: #f7b15b;
+      --pink: #fc97b8;
+      --red: #e78447;
+      --purple: #c8a9fc;
+      --error: #ff2828;
+      --tab-selected: #CCC0A9;
+      --tab-bg: rgba(237, 231, 219, 0.91);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--cream-600);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 16px;
+    }
+
+    .phone-frame {
+      width: 100%;
+      max-width: 390px;
+      min-height: 700px;
+      background: var(--cream-500);
+      border-radius: 32px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      min-height: 700px;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* Header */
+    .header {
+      background: var(--cream-500);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 0 rgba(10, 10, 11, 0.15);
+      position: relative;
+      z-index: 10;
+    }
+
+    .header-title {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--black-500);
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .header-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 4px;
+      color: var(--black-500);
+    }
+
+    .header-text-btn {
+      background: none;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--black-500);
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      padding: 24px 20px;
+      overflow-y: auto;
+      padding-bottom: 100px;
+    }
+
+    .content.game-content {
+      padding: 16px;
+      padding-bottom: 20px;
+    }
+
+    /* Typography */
+    .serif {
+      font-family: 'Merriweather', Georgia, serif;
+    }
+
+    .title-xl {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--black-500);
+      line-height: 1.2;
+    }
+
+    .title-lg {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--black-500);
+    }
+
+    .subtitle {
+      font-family: 'Merriweather', Georgia, serif;
+      font-size: 16px;
+      color: var(--black-500);
+      opacity: 0.6;
+      line-height: 1.5;
+    }
+
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--black-500);
+      opacity: 0.5;
+      margin-bottom: 8px;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 16px 24px;
+      border-radius: 40px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, opacity 0.1s;
+      border: 1.5px solid var(--black-500);
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--black-500);
+      color: var(--cream-500);
+    }
+
+    .btn-inverse {
+      background: transparent;
+      color: var(--black-500);
+    }
+
+    .btn-secondary {
+      background: var(--cream-700);
+      color: var(--black-500);
+    }
+
+    .btn-small {
+      padding: 10px 20px;
+      font-size: 14px;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-row .btn {
+      flex: 1;
+    }
+
+    /* Game Icon */
+    .game-icon {
+      width: 120px;
+      height: 120px;
+      background: var(--blue);
+      border: 2px solid var(--black-500);
+      border-radius: 24px;
+      margin: 0 auto 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .game-icon svg {
+      width: 60px;
+      height: 60px;
+    }
+
+    /* Tab Bar */
+    .tab-bar {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--tab-bg);
+      backdrop-filter: blur(13px);
+      -webkit-backdrop-filter: blur(13px);
+      border-radius: 100px;
+      padding: 6px;
+      display: flex;
+      gap: 4px;
+      border: 0.5px solid rgba(0,0,0,0.05);
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 16px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .tab-item.active {
+      background: var(--tab-selected);
+    }
+
+    .tab-item span {
+      font-size: 18px;
+      margin-bottom: 2px;
+    }
+
+    .tab-item small {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--black-500);
+    }
+
+    .tab-item.active small {
+      font-weight: 600;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--cream-700);
+      border: 2px solid var(--black-500);
+      border-bottom-width: 4px;
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+
+    .card-blue {
+      background: var(--blue);
+    }
+
+    .card-teal {
+      background: var(--teal);
+    }
+
+    .card-green {
+      background: var(--green);
+    }
+
+    .card-orange {
+      background: var(--orange);
+    }
+
+    .card-pink {
+      background: var(--pink);
+    }
+
+    /* Link Input */
+    .link-box {
+      background: var(--white);
+      border: 2px solid var(--black-500);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .link-box code {
+      font-size: 13px;
+      color: var(--black-500);
+      font-family: monospace;
+    }
+
+    .copy-btn {
+      background: var(--blue);
+      border: 1.5px solid var(--black-500);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .copy-btn.copied {
+      background: var(--green);
+    }
+
+    /* Player List */
+    .player-list {
+      background: var(--cream-700);
+      border: 2px solid var(--black-500);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .player-list-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .player-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-top: 1px solid rgba(10,10,11,0.1);
+    }
+
+    .player-row:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .player-name {
+      font-size: 14px;
+    }
+
+    .player-status {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .player-status.ready {
+      color: var(--green);
+    }
+
+    .player-status.waiting {
+      opacity: 0.4;
+    }
+
+    /* Difficulty Cards */
+    .difficulty-card {
+      border: 2px solid var(--black-500);
+      border-bottom-width: 4px;
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .difficulty-card:active {
+      transform: scale(0.98);
+    }
+
+    .difficulty-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .difficulty-card p {
+      font-family: 'Merriweather', Georgia, serif;
+      font-size: 14px;
+      opacity: 0.7;
+    }
+
+    /* Dice */
+    .dice-container {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      margin: 32px 0;
+    }
+
+    .dice-player {
+      text-align: center;
+    }
+
+    .dice {
+      width: 64px;
+      height: 64px;
+      background: var(--white);
+      border: 2px solid var(--black-500);
+      border-bottom-width: 4px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+    }
+
+    .dice.rolling {
+      animation: shake 0.15s infinite;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: rotate(-8deg); }
+      50% { transform: rotate(8deg); }
+    }
+
+    .dice-label {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .dice-result {
+      background: var(--blue);
+      border: 2px solid var(--black-500);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .dice-result span {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    /* Game Screen */
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .score {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .score b {
+      color: var(--blue);
+    }
+
+    .score.opponent b {
+      color: var(--red);
+    }
+
+    .timer {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .timer.warning {
+      color: var(--error);
+    }
+
+    .turn-indicator {
+      background: var(--blue);
+      border: 2px solid var(--black-500);
+      border-radius: 40px;
+      padding: 10px 16px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .turn-indicator.opponent {
+      background: var(--cream-700);
+    }
+
+    /* Game Cards Grid */
+    .cards-section {
+      margin-bottom: 16px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .game-card {
+      background: var(--blue);
+      border: 2px solid var(--black-500);
+      border-bottom-width: 4px;
+      border-radius: 12px;
+      padding: 16px 12px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      font-family: 'Merriweather', Georgia, serif;
+      font-size: 14px;
+      line-height: 1.4;
+      text-align: center;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .game-card.fact {
+      background: var(--teal);
+    }
+
+    .game-card.selected {
+      transform: scale(1.03);
+      box-shadow: 0 0 0 3px var(--orange);
+    }
+
+    .game-card.linked {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .game-card.linked::after {
+      content: '✓';
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 22px;
+      height: 22px;
+      background: var(--white);
+      border: 2px solid var(--black-500);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-family: system-ui;
+    }
+
+    /* Message Toast */
+    .toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--green);
+      border: 2px solid var(--black-500);
+      border-radius: 16px;
+      padding: 16px 32px;
+      font-weight: 700;
+      font-size: 18px;
+      z-index: 100;
+      animation: pop 0.3s ease;
+    }
+
+    .toast.error {
+      background: var(--red);
+    }
+
+    @keyframes pop {
+      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+
+    /* End Screen */
+    .celebration {
+      text-align: center;
+      position: relative;
+    }
+
+    .mascot {
+      width: 100px;
+      height: 100px;
+      background: var(--blue);
+      border: 2px solid var(--black-500);
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      animation: dance 0.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes dance {
+      from { transform: rotate(-5deg) scale(1); }
+      to { transform: rotate(5deg) scale(1.05); }
+    }
+
+    .firework {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      animation: firework 1.5s ease-out infinite;
+    }
+
+    @keyframes firework {
+      0% { opacity: 1; transform: scale(1) translateY(0); }
+      100% { opacity: 0; transform: scale(1.5) translateY(-40px); }
+    }
+
+    .score-display {
+      background: var(--cream-700);
+      border: 2px solid var(--black-500);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      justify-content: space-around;
+      margin: 24px 0;
+    }
+
+    .score-col {
+      text-align: center;
+    }
+
+    .score-col .number {
+      font-size: 36px;
+      font-weight: 900;
+    }
+
+    .score-col .number.you {
+      color: var(--blue);
+    }
+
+    .score-col .number.opponent {
+      color: var(--red);
+    }
+
+    .score-col .label {
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 1;
+      text-transform: none;
+      margin: 0;
+    }
+
+    .score-divider {
+      width: 2px;
+      background: rgba(10,10,11,0.15);
+    }
+
+    .best-link {
+      background: var(--blue);
+      border: 2px solid var(--black-500);
+      border-bottom-width: 4px;
+      border-radius: 16px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .best-link .label {
+      margin-bottom: 4px;
+    }
+
+    .best-link p {
+      font-family: 'Merriweather', Georgia, serif;
+      font-size: 14px;
+    }
+
+    /* Center content helper */
+    .center {
+      text-align: center;
+    }
+
+    .mb-8 { margin-bottom: 8px; }
+    .mb-16 { margin-bottom: 16px; }
+    .mb-24 { margin-bottom: 24px; }
+    .mb-32 { margin-bottom: 32px; }
+
+    /* Hide scrollbar */
+    .content::-webkit-scrollbar {
+      display: none;
+    }
+    .content {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone-frame">
+    
+    <!-- HOME SCREEN -->
+    <div id="screen-home" class="screen active">
+      <div class="header">
+        <div></div>
+        <span class="header-title">Links</span>
+        <button class="header-btn">⚙️</button>
+      </div>
+      <div class="content center">
+        <div class="game-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0b" stroke-width="2">
+            <circle cx="6" cy="6" r="2.5"/>
+            <circle cx="18" cy="6" r="2.5"/>
+            <circle cx="6" cy="18" r="2.5"/>
+            <circle cx="18" cy="18" r="2.5"/>
+            <path d="M8.5 6h7M6 8.5v7M18 8.5v7M8.5 18h7"/>
+          </svg>
+        </div>
+        <h1 class="title-xl mb-8">Links</h1>
+        <p class="subtitle mb-32">Connect items & facts to build the map</p>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="showScreen('difficulty')">Single Player</button>
+          <button class="btn btn-inverse" onclick="showScreen('lobby')">Create Game</button>
+          <button class="btn btn-secondary" onclick="showScreen('join')">Join Game</button>
+        </div>
+      </div>
+      <div class="tab-bar">
+        <div class="tab-item active"><span>📅</span><small>Today</small></div>
+        <div class="tab-item"><span>📚</span><small>Archive</small></div>
+        <div class="tab-item"><span>😊</span><small>Profile</small></div>
+      </div>
+    </div>
+
+    <!-- DIFFICULTY SCREEN -->
+    <div id="screen-difficulty" class="screen">
+      <div class="header">
+        <button class="header-btn" onclick="showScreen('home')">←</button>
+        <span class="header-title">Difficulty</span>
+        <div></div>
+      </div>
+      <div class="content">
+        <p class="subtitle mb-24">Choose your challenge level</p>
+        <div class="difficulty-card" style="background: var(--green);" onclick="startSinglePlayer('easy')">
+          <h3>Easy</h3>
+          <p>Direct, obvious connections</p>
+        </div>
+        <div class="difficulty-card" style="background: var(--orange);" onclick="startSinglePlayer('medium')">
+          <h3>Medium</h3>
+          <p>Moderate abstraction required</p>
+        </div>
+        <div class="difficulty-card" style="background: var(--red);" onclick="startSinglePlayer('hard')">
+          <h3>Hard</h3>
+          <p>Indirect, multi-step relationships</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOBBY SCREEN (Create Game) -->
+    <div id="screen-lobby" class="screen">
+      <div class="header">
+        <button class="header-btn" onclick="showScreen('home')">←</button>
+        <span class="header-title">Game Lobby</span>
+        <div></div>
+      </div>
+      <div class="content">
+        <p class="subtitle mb-16">Share this link with a friend to play together</p>
+        <div class="link-box">
+          <code id="game-link">playlinks.com/game/ABC123</code>
+          <button class="copy-btn" onclick="copyLink(this)">Copy</button>
+        </div>
+        <div class="player-list">
+          <div class="player-list-title">Players</div>
+          <div class="player-row">
+            <span class="player-name">You (Host)</span>
+            <span class="player-status ready">● Ready</span>
+          </div>
+          <div class="player-row" id="player2-row">
+            <span class="player-name" id="player2-name">Waiting for player...</span>
+            <span class="player-status waiting" id="player2-status">○ Waiting</span>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="start-btn" disabled onclick="showScreen('dice')">Waiting for player...</button>
+        <p class="subtitle center" style="margin-top: 16px; font-size: 14px;">A rematch invite will be sent after the game</p>
+      </div>
+    </div>
+
+    <!-- JOIN SCREEN -->
+    <div id="screen-join" class="screen">
+      <div class="header">
+        <button class="header-btn" onclick="showScreen('home')">←</button>
+        <span class="header-title">Join Game</span>
+        <div></div>
+      </div>
+      <div class="content">
+        <p class="subtitle mb-24">Enter the game code shared by your friend</p>
+        <div class="link-box" style="margin-bottom: 16px;">
+          <input type="text" placeholder="Enter game code" style="border: none; background: transparent; font-size: 14px; width: 100%; outline: none;" value="ABC123">
+        </div>
+        <button class="btn btn-primary" onclick="joinGame()">Join Game</button>
+      </div>
+    </div>
+
+    <!-- DICE ROLL SCREEN -->
+    <div id="screen-dice" class="screen">
+      <div class="header">
+        <div></div>
+        <span class="header-title">First Turn</span>
+        <div></div>
+      </div>
+      <div class="content center">
+        <h2 class="title-lg mb-8">Roll for First Turn</h2>
+        <p class="subtitle mb-16">Highest roll goes first</p>
+        <div class="dice-container">
+          <div class="dice-player">
+            <div class="dice" id="dice1">
+              <svg width="40" height="40" viewBox="0 0 100 100" id="dice1-dots"></svg>
+            </div>
+            <div class="dice-label">You</div>
+          </div>
+          <div class="dice-player">
+            <div class="dice" id="dice2">
+              <svg width="40" height="40" viewBox="0 0 100 100" id="dice2-dots"></svg>
+            </div>
+            <div class="dice-label">Opponent</div>
+          </div>
+        </div>
+        <div class="dice-result" id="dice-result" style="display: none;">
+          <span id="dice-winner">You go first!</span>
+        </div>
+        <button class="btn btn-primary" id="dice-continue" style="display: none;" onclick="showScreen('game')">Continue</button>
+        <button class="btn btn-primary" id="dice-roll" onclick="rollDice()">Roll Dice</button>
+      </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="screen-game" class="screen">
+      <div class="header" style="padding: 12px 16px;">
+        <span class="score">You: <b id="score-you">0</b></span>
+        <span class="header-title" style="position: static; transform: none;">Links</span>
+        <span class="score opponent">Opp: <b id="score-opp">0</b></span>
+      </div>
+      <div class="content game-content">
+        <div class="game-header">
+          <div></div>
+          <div class="timer" id="timer">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+            <span id="timer-value">45s</span>
+          </div>
+          <div></div>
+        </div>
+        <div class="turn-indicator" id="turn-indicator">Your Turn — Select 2 cards</div>
+        
+        <div class="cards-section">
+          <div class="label">Items</div>
+          <div class="cards-grid" id="items-grid"></div>
+        </div>
+        
+        <div class="cards-section">
+          <div class="label">Facts</div>
+          <div class="cards-grid" id="facts-grid"></div>
+        </div>
+        
+        <div class="btn-row" style="margin-top: 8px;">
+          <button class="btn btn-secondary btn-small" onclick="shuffleHand()">Shuffle</button>
+          <button class="btn btn-inverse btn-small" onclick="endGame()">End Game</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- END SCREEN -->
+    <div id="screen-end" class="screen">
+      <div class="header">
+        <div></div>
+        <span class="header-title">Game Over</span>
+        <div></div>
+      </div>
+      <div class="content">
+        <div class="celebration">
+          <div id="fireworks"></div>
+          <div class="mascot">🎉</div>
+          <h1 class="title-xl mb-8" id="end-title">You Won!</h1>
+          <p class="subtitle mb-16" id="end-subtitle">Great job connecting the links</p>
+        </div>
+        <div class="score-display">
+          <div class="score-col">
+            <div class="number you" id="final-score-you">0</div>
+            <div class="label">You</div>
+          </div>
+          <div class="score-divider"></div>
+          <div class="score-col">
+            <div class="number opponent" id="final-score-opp">0</div>
+            <div class="label">Opponent</div>
+          </div>
+        </div>
+        <div class="best-link">
+          <div class="label">Best Link</div>
+          <p id="best-link-text">Turmeric → Grows below the ground</p>
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="rematch()">🔥 Challenge Again Tomorrow</button>
+          <button class="btn btn-inverse" onclick="showScreen('home'); resetGame();">Back to Home</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Toast (hidden by default) -->
+  <div id="toast" class="toast" style="display: none;"></div>
+
+  <script>
+    // Game State
+    let gameState = {
+      score: { you: 0, opponent: 0 },
+      selected: [],
+      linked: [],
+      turn: 'you',
+      timer: 45,
+      timerInterval: null,
+      difficulty: 'medium'
+    };
+
+    // Game Data
+    const gameData = {
+      items: [
+        { id: 'i1', text: 'Turmeric' },
+        { id: 'i2', text: 'Allspice' },
+        { id: 'i3', text: 'Saffron' },
+        { id: 'i4', text: 'Cinnamon' }
+      ],
+      facts: [
+        { id: 'f1', text: 'Grows below the ground' },
+        { id: 'f2', text: 'Used as a dye' },
+        { id: 'f3', text: 'From tree bark' },
+        { id: 'f4', text: 'Most expensive spice' }
+      ],
+      validLinks: [
+        ['i1', 'f1'], ['i1', 'f2'],
+        ['i3', 'f2'], ['i3', 'f4'],
+        ['i4', 'f3']
+      ]
+    };
+
+    // Dice patterns
+    const dicePatterns = {
+      1: [[50, 50]],
+      2: [[30, 30], [70, 70]],
+      3: [[30, 30], [50, 50], [70, 70]],
+      4: [[30, 30], [70, 30], [30, 70], [70, 70]],
+      5: [[30, 30], [70, 30], [50, 50], [30, 70], [70, 70]],
+      6: [[30, 30], [70, 30], [30, 50], [70, 50], [30, 70], [70, 70]]
+    };
+
+    // Screen Navigation
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-' + screenId).classList.add('active');
+      
+      if (screenId === 'lobby') {
+        simulatePlayerJoin();
+      }
+      if (screenId === 'game') {
+        initGame();
+      }
+      if (screenId === 'dice') {
+        resetDice();
+      }
+    }
+
+    // Copy Link
+    function copyLink(btn) {
+      const link = document.getElementById('game-link').textContent;
+      navigator.clipboard.writeText(link).catch(() => {});
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    }
+
+    // Simulate player joining lobby
+    function simulatePlayerJoin() {
+      const nameEl = document.getElementById('player2-name');
+      const statusEl = document.getElementById('player2-status');
+      const startBtn = document.getElementById('start-btn');
+      
+      nameEl.textContent = 'Waiting for player...';
+      statusEl.textContent = '○ Waiting';
+      statusEl.className = 'player-status waiting';
+      startBtn.disabled = true;
+      startBtn.textContent = 'Waiting for player...';
+      
+      setTimeout(() => {
+        nameEl.textContent = 'Player 2';
+        statusEl.textContent = '● Ready';
+        statusEl.className = 'player-status ready';
+        startBtn.disabled = false;
+        startBtn.textContent = 'Start Game';
+      }, 2000);
+    }
+
+    // Join Game
+    function joinGame() {
+      showScreen('dice');
+    }
+
+    // Difficulty selection
+    function startSinglePlayer(diff) {
+      gameState.difficulty = diff;
+      showScreen('dice');
+    }
+
+    // Dice
+    function drawDice(svgId, value) {
+      const svg = document.getElementById(svgId);
+      const dots = dicePatterns[value];
+      svg.innerHTML = dots.map(([x, y]) => 
+        `<circle cx="${x}" cy="${y}" r="10" fill="#0a0a0b"/>`
+      ).join('');
+    }
+
+    function resetDice() {
+      document.getElementById('dice1').classList.remove('rolling');
+      document.getElementById('dice2').classList.remove('rolling');
+      document.getElementById('dice-result').style.display = 'none';
+      document.getElementById('dice-continue').style.display = 'none';
+      document.getElementById('dice-roll').style.display = 'block';
+      drawDice('dice1-dots', 1);
+      drawDice('dice2-dots', 1);
+    }
+
+    function rollDice() {
+      const dice1 = document.getElementById('dice1');
+      const dice2 = document.getElementById('dice2');
+      dice1.classList.add('rolling');
+      dice2.classList.add('rolling');
+      document.getElementById('dice-roll').style.display = 'none';
+      
+      const rollInterval = setInterval(() => {
+        drawDice('dice1-dots', Math.ceil(Math.random() * 6));
+        drawDice('dice2-dots', Math.ceil(Math.random() * 6));
+      }, 80);
+      
+      setTimeout(() => {
+        clearInterval(rollInterval);
+        dice1.classList.remove('rolling');
+        dice2.classList.remove('rolling');
+        
+        const v1 = Math.ceil(Math.random() * 6);
+        const v2 = Math.ceil(Math.random() * 6);
+        drawDice('dice1-dots', v1);
+        drawDice('dice2-dots', v2);
+        
+        const winner = v1 >= v2 ? 'You go first!' : 'Opponent goes first!';
+        gameState.turn = v1 >= v2 ? 'you' : 'opponent';
+        
+        document.getElementById('dice-winner').textContent = winner;
+        document.getElementById('dice-result').style.display = 'block';
+        document.getElementById('dice-continue').style.display = 'block';
+      }, 1500);
+    }
+
+    // Game Logic
+    function initGame() {
+      gameState.score = { you: 0, opponent: 0 };
+      gameState.selected = [];
+      gameState.linked = [];
+      gameState.timer = 45;
+      
+      updateScore();
+      renderCards();
+      updateTurnIndicator();
+      startTimer();
+    }
+
+    function renderCards() {
+      const itemsGrid = document.getElementById('items-grid');
+      const factsGrid = document.getElementById('facts-grid');
+      
+      itemsGrid.innerHTML = gameData.items.map(item => `
+        <div class="game-card ${gameState.linked.includes(item.id) ? 'linked' : ''} ${gameState.selected.find(s => s.id === item.id) ? 'selected' : ''}" 
+             data-id="${item.id}" 
+             data-type="item"
+             onclick="selectCard('${item.id}', 'item')">
+          ${item.text}
+        </div>
+      `).join('');
+      
+      factsGrid.innerHTML = gameData.facts.map(fact => `
+        <div class="game-card fact ${gameState.linked.includes(fact.id) ? 'linked' : ''} ${gameState.selected.find(s => s.id === fact.id) ? 'selected' : ''}" 
+             data-id="${fact.id}" 
+             data-type="fact"
+             onclick="selectCard('${fact.id}', 'fact')">
+          ${fact.text}
+        </div>
+      `).join('');
+    }
+
+    function selectCard(id, type) {
+      if (gameState.turn !== 'you') return;
+      if (gameState.linked.includes(id)) return;
+      
+      const card = type === 'item' 
+        ? gameData.items.find(i => i.id === id)
+        : gameData.facts.find(f => f.id === id);
+      
+      // Toggle selection
+      if (gameState.selected.find(s => s.id === id)) {
+        gameState.selected = gameState.selected.filter(s => s.id !== id);
+        renderCards();
+        return;
+      }
+      
+      gameState.selected.push({ ...card, type });
+      renderCards();
+      
+      // Check for link when 2 cards selected
+      if (gameState.selected.length === 2) {
+        checkLink();
+      }
+    }
+
+    function checkLink() {
+      const [card1, card2] = gameState.selected;
+      const isValid = gameData.validLinks.some(([a, b]) =>
+        (card1.id === a && card2.id === b) || (card1.id === b && card2.id === a)
+      );
+      
+      setTimeout(() => {
+        if (isValid) {
+          gameState.score.you += 10;
+          gameState.linked.push(card1.id, card2.id);
+          showToast('+10 points!', false);
+        } else {
+          showToast('Invalid link', true);
+        }
+        
+        gameState.selected = [];
+        updateScore();
+        renderCards();
+        
+        // Switch turns
+        setTimeout(() => {
+          gameState.turn = 'opponent';
+          updateTurnIndicator();
+          resetTimer();
+          
+          // Simulate opponent turn
+          setTimeout(() => {
+            gameState.score.opponent += 10;
+            updateScore();
+            gameState.turn = 'you';
+            updateTurnIndicator();
+            resetTimer();
+          }, 1500);
+        }, 500);
+      }, 400);
+    }
+
+    function updateScore() {
+      document.getElementById('score-you').textContent = gameState.score.you;
+      document.getElementById('score-opp').textContent = gameState.score.opponent;
+    }
+
+    function updateTurnIndicator() {
+      const indicator = document.getElementById('turn-indicator');
+      if (gameState.turn === 'you') {
+        indicator.textContent = 'Your Turn — Select 2 cards';
+        indicator.classList.remove('opponent');
+      } else {
+        indicator.textContent = "Opponent's Turn";
+        indicator.classList.add('opponent');
+      }
+    }
+
+    function startTimer() {
+      if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+      
+      gameState.timerInterval = setInterval(() => {
+        gameState.timer--;
+        const timerEl = document.getElementById('timer-value');
+        const timerContainer = document.getElementById('timer');
+        timerEl.textContent = gameState.timer + 's';
+        
+        if (gameState.timer <= 10) {
+          timerContainer.classList.add('warning');
+        } else {
+          timerContainer.classList.remove('warning');
+        }
+        
+        if (gameState.timer <= 0) {
+          resetTimer();
+          showToast("Time's up!", true);
+          // Switch turns
+          gameState.turn = gameState.turn === 'you' ? 'opponent' : 'you';
+          updateTurnIndicator();
+        }
+      }, 1000);
+    }
+
+    function resetTimer() {
+      gameState.timer = 45;
+      document.getElementById('timer-value').textContent = '45s';
+      document.getElementById('timer').classList.remove('warning');
+    }
+
+    function shuffleHand() {
+      showToast('Hand shuffled!', false);
+    }
+
+    function endGame() {
+      if (gameState.timerInterval) clearInterval(gameState.timerInterval);
+      
+      const youWon = gameState.score.you >= gameState.score.opponent;
+      document.getElementById('end-title').textContent = youWon ? 'You Won!' : 'Game Over';
+      document.getElementById('end-subtitle').textContent = youWon 
+        ? 'Great job connecting the links' 
+        : 'Better luck next time';
+      document.getElementById('final-score-you').textContent = gameState.score.you;
+      document.getElementById('final-score-opp').textContent = gameState.score.opponent;
+      
+      // Add fireworks
+      createFireworks();
+      
+      showScreen('end');
+    }
+
+    function createFireworks() {
+      const container = document.getElementById('fireworks');
+      container.innerHTML = '';
+      const colors = ['#50abf6', '#f7b15b', '#fc97b8', '#8acb5e', '#c8a9fc'];
+      
+      for (let i = 0; i < 15; i++) {
+        const fw = document.createElement('div');
+        fw.className = 'firework';
+        fw.style.background = colors[i % colors.length];
+        fw.style.left = (10 + Math.random() * 80) + '%';
+        fw.style.top = (5 + Math.random() * 30) + '%';
+        fw.style.animationDelay = (Math.random() * 0.5) + 's';
+        container.appendChild(fw);
+      }
+    }
+
+    function resetGame() {
+      gameState = {
+        score: { you: 0, opponent: 0 },
+        selected: [],
+        linked: [],
+        turn: 'you',
+        timer: 45,
+        timerInterval: null,
+        difficulty: 'medium'
+      };
+    }
+
+    function rematch() {
+      showToast('Rematch invite sent!', false);
+      setTimeout(() => {
+        resetGame();
+        showScreen('home');
+      }, 1500);
+    }
+
+    // Toast
+    function showToast(message, isError) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast' + (isError ? ' error' : '');
+      toast.style.display = 'block';
+      
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 1200);
+    }
+
+    // Initialize
+    drawDice('dice1-dots', 1);
+    drawDice('dice2-dots', 1);
+  </script>
+</body>
+</html>
