@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spark — Build Your Chain</title>
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f6f3ed; }
+    .root { min-height: 100vh; background: #f6f3ed; font-family: 'DM Sans', system-ui, sans-serif; display: flex; justify-content: center; padding: 2rem 1rem 4rem; }
+    .wrap { width: 100%; max-width: 402px; position: relative; }
+    .wordmark { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #b5a99a; margin-bottom: 2rem; }
+
+    .intro-card { background: #50abf6; border: 2px solid #0a0a0b; border-bottom-width: 4px; border-radius: 20px; padding: 2rem 1.75rem; margin-bottom: 1.5rem; }
+    .intro-emoji { font-size: 48px; display: block; margin-bottom: 1rem; }
+    .intro-title { font-family: 'Merriweather', Georgia, serif; font-size: 26px; font-weight: 700; color: #0a0a0b; line-height: 1.2; margin-bottom: 10px; }
+    .intro-desc { font-size: 14px; color: rgba(10,10,11,0.75); line-height: 1.6; margin-bottom: 1.5rem; }
+    .intro-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem; }
+    .intro-badge { background: rgba(255,255,255,0.9); border-radius: 20px; padding: 6px 12px; font-size: 12px; font-weight: 600; color: #0a0a0b; display: flex; align-items: center; gap: 6px; }
+    .start-btn { width: 100%; background: #0a0a0b; color: white; border: none; border-radius: 40px; padding: 14px; font-size: 15px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .start-btn:hover { background: #333; }
+
+    .g-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .back-btn { font-size: 13px; color: #b5a99a; background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; transition: color 0.15s; padding: 0; }
+    .back-btn:hover { color: #0a0a0b; }
+    .step-label { font-size: 12px; color: #8a8070; font-weight: 500; }
+
+    .path-display { background: white; border: 2px solid #0a0a0b; border-bottom-width: 4px; border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; }
+    .path-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #b5a99a; margin-bottom: 10px; }
+    .path-nodes { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+    .path-node { background: #d4f0c0; border: 1.5px solid #8acb5e; border-radius: 8px; padding: 5px 10px; font-size: 12px; font-weight: 500; color: #1a4a08; }
+    .path-arrow { color: #b5a99a; font-size: 12px; }
+    .path-current { background: #50abf6; border-color: #2d8ad8; color: #0a0a0b; }
+
+    .node-card { background: #8acb5e; border: 2px solid #0a0a0b; border-bottom-width: 4px; border-radius: 16px; padding: 1.75rem 1.5rem; margin-bottom: 14px; position: relative; overflow: hidden; }
+    .node-card::before { content: ''; position: absolute; top: -30px; right: -30px; width: 100px; height: 100px; background: rgba(255,255,255,0.15); border-radius: 50%; }
+    .node-name { font-family: 'Merriweather', Georgia, serif; font-size: 24px; font-weight: 700; color: #0a0a0b; line-height: 1.2; margin-bottom: 6px; position: relative; }
+    .node-q { font-size: 13px; color: rgba(10,10,11,0.6); font-weight: 500; position: relative; }
+
+    .options { display: flex; flex-direction: column; gap: 8px; }
+    .opt { background: white; border: 2px solid #0a0a0b; border-bottom-width: 3px; border-radius: 12px; padding: 14px 18px; text-align: left; font-size: 15px; color: #0a0a0b; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; transition: all 0.15s; display: flex; align-items: center; justify-content: space-between; }
+    .opt:hover { transform: translateX(4px); background: #f6f3ed; }
+    .opt-arrow { color: #b5a99a; transition: transform 0.15s; }
+    .opt:hover .opt-arrow { transform: translateX(3px); color: #0a0a0b; }
+
+    .celebration { text-align: center; }
+    .confetti-container { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; }
+    .confetti { position: absolute; opacity: 0; }
+    @keyframes confettiFall { 
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    .result-card { background: white; border: 2px solid #0a0a0b; border-bottom-width: 4px; border-radius: 20px; padding: 2rem; margin-bottom: 1.5rem; animation: slideUp 0.4s ease; }
+    .result-icon { font-size: 72px; display: block; margin-bottom: 1rem; animation: bounce 0.6s ease; }
+    .result-congrats { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #8acb5e; margin-bottom: 6px; }
+    .result-badge-name { font-family: 'Merriweather', Georgia, serif; font-size: 24px; font-weight: 700; color: #0a0a0b; margin-bottom: 12px; line-height: 1.3; }
+    .result-pill { display: inline-flex; align-items: center; gap: 6px; background: #d4f0c0; border: 1.5px solid #8acb5e; border-radius: 999px; padding: 6px 14px; font-size: 13px; color: #1a4a08; font-weight: 600; }
+
+    .chain-reveal { background: #f6f3ed; border: 2px solid #e4ded3; border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
+    .chain-reveal-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #b5a99a; margin-bottom: 1rem; text-align: center; }
+    .chain-reveal-nodes { display: flex; flex-direction: column; align-items: center; gap: 0; }
+    .chain-reveal-row { display: flex; align-items: center; gap: 10px; opacity: 0; transform: translateY(8px); transition: all 0.3s ease; }
+    .chain-reveal-row.visible { opacity: 1; transform: translateY(0); }
+    .chain-reveal-dot { width: 10px; height: 10px; border-radius: 50%; background: #8acb5e; border: 1.5px solid #6ab048; flex-shrink: 0; }
+    .chain-reveal-dot.end { background: #f7b15b; border-color: #d49a40; }
+    .chain-reveal-text { font-size: 14px; color: #0a0a0b; font-weight: 500; padding: 6px 0; }
+    .chain-reveal-line { width: 2px; height: 12px; background: #d4f0c0; margin-left: 4px; }
+
+    .cta-section { display: flex; flex-direction: column; gap: 10px; }
+    .cta-primary { width: 100%; background: #0a0a0b; color: white; border: none; border-radius: 40px; padding: 14px; font-size: 15px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+    .cta-primary:hover { background: #333; }
+    .cta-secondary { width: 100%; background: transparent; color: #0a0a0b; border: 2px solid #0a0a0b; border-radius: 40px; padding: 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .cta-secondary:hover { background: #e4ded3; }
+
+    .other-badges { margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e4ded3; }
+    .other-badges-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #b5a99a; margin-bottom: 12px; text-align: center; }
+    .other-badges-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+    .other-badge { background: white; border: 1.5px solid #e4ded3; border-radius: 10px; padding: 8px 12px; font-size: 12px; color: #8a8070; display: flex; align-items: center; gap: 6px; }
+    .other-badge.earned { border-color: #8acb5e; color: #1a4a08; background: #f0fae8; }
+
+    @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+    .fade { animation: slideUp 0.25s ease; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // Badges and their terminal nodes
+    const BADGES = {
+      "Gorilla": { id: "spicy", name: "Spicy Silverback", icon: "🦍", color: "#8acb5e" },
+      "Coffee": { id: "taste", name: "It's an acquired taste", icon: "🍋", color: "#f7b15b" },
+      "Petroleum": { id: "precious", name: "Precious commodity", icon: "⚗️", color: "#c8a9fc" },
+      "Salt": { id: "bffs", name: "BFFs", icon: "🤝", color: "#50abf6" }
+    };
+
+    // The connection graph - each node has exactly 2 options
+    // Terminal nodes: Gorilla, Coffee, Petroleum, Salt
+    const GRAPH = {
+      "Black pepper": [
+        { text: "Native to India", next: "Native to India" },
+        { text: "Common in Roman cooking", next: "Common in Roman cooking" }
+      ],
+      
+      // === INDIA BRANCH ===
+      "Native to India": [
+        { text: "Tiger", next: "Tiger" },
+        { text: "Mango", next: "Mango" }
+      ],
+      
+      // Tiger path → Gorilla
+      "Tiger": [
+        { text: "Largest member of family", next: "Largest member of family" },
+        { text: "Striped coat", next: "Striped coat" }
+      ],
+      "Striped coat": [
+        { text: "Zebra", next: "Zebra" },
+        { text: "Bumblebee", next: "Bumblebee" }
+      ],
+      "Zebra": [
+        { text: "Native to Africa", next: "Native to Africa" },
+        { text: "Herd animal", next: "Herd animal" }
+      ],
+      "Native to Africa": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Herd animal": [
+        { text: "Elephant", next: "Elephant" },
+        { text: "Buffalo", next: "Buffalo" }
+      ],
+      "Elephant": [
+        { text: "Long memory", next: "Long memory" },
+        { text: "Largest land animal", next: "Largest land animal" }
+      ],
+      "Largest land animal": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Rainforest", next: "Rainforest" }
+      ],
+      "Rainforest": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Long memory": [
+        { text: "Oral tradition", next: "Oral tradition" },
+        { text: "Ancient", next: "Ancient" }
+      ],
+      "Oral tradition": [
+        { text: "Salt as currency", next: "Salt as currency" },
+        { text: "Coffee house culture", next: "Coffee house culture" }
+      ],
+      "Salt as currency": [
+        { text: "Salt", next: "Salt" },
+        { text: "Precious commodity", next: "Precious commodity" }
+      ],
+      "Precious commodity": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Salt", next: "Salt" }
+      ],
+      "Coffee house culture": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Intellectual exchange", next: "Intellectual exchange" }
+      ],
+      "Intellectual exchange": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Salt of the earth", next: "Salt of the earth" }
+      ],
+      "Salt of the earth": [
+        { text: "Salt", next: "Salt" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Ancient": [
+        { text: "Petroleum formation", next: "Petroleum formation" },
+        { text: "Salt deposits", next: "Salt deposits" }
+      ],
+      "Petroleum formation": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Fossil fuels", next: "Fossil fuels" }
+      ],
+      "Fossil fuels": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Salt", next: "Salt" }
+      ],
+      "Salt deposits": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Buffalo": [
+        { text: "Grazing animal", next: "Grazing animal" },
+        { text: "Native to Americas", next: "Native to Americas" }
+      ],
+      "Grazing animal": [
+        { text: "Grasslands", next: "Grasslands" },
+        { text: "Salt lick", next: "Salt lick" }
+      ],
+      "Grasslands": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Petroleum deposits", next: "Petroleum deposits" }
+      ],
+      "Petroleum deposits": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Salt lick": [
+        { text: "Salt", next: "Salt" },
+        { text: "Mineral deposits", next: "Mineral deposits" }
+      ],
+      "Mineral deposits": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Native to Americas": [
+        { text: "Vanilla", next: "Vanilla" },
+        { text: "Petroleum industry", next: "Petroleum industry" }
+      ],
+      "Vanilla": [
+        { text: "Tropical rainforest", next: "Tropical rainforest" },
+        { text: "Flavoring", next: "Flavoring" }
+      ],
+      "Tropical rainforest": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Flavoring": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Salt", next: "Salt" }
+      ],
+      "Petroleum industry": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Texas", next: "Texas" }
+      ],
+      "Texas": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Salt flats", next: "Salt flats" }
+      ],
+      "Salt flats": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Bumblebee": [
+        { text: "Produces honey", next: "Produces honey" },
+        { text: "Pollinator", next: "Pollinator" }
+      ],
+      "Produces honey": [
+        { text: "Antimicrobial", next: "Antimicrobial" },
+        { text: "Sweet", next: "Sweet" }
+      ],
+      "Antimicrobial": [
+        { text: "Salt", next: "Salt" },
+        { text: "Honey preservation", next: "Honey preservation" }
+      ],
+      "Honey preservation": [
+        { text: "Salt", next: "Salt" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Sweet": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Fruit", next: "Fruit" }
+      ],
+      "Fruit": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee cherry", next: "Coffee cherry" }
+      ],
+      "Coffee cherry": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Pollinator": [
+        { text: "Coffee plants", next: "Coffee plants" },
+        { text: "Flowers", next: "Flowers" }
+      ],
+      "Coffee plants": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Tropical", next: "Tropical" }
+      ],
+      "Tropical": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Flowers": [
+        { text: "Gorilla habitat", next: "Gorilla habitat" },
+        { text: "Essential oils", next: "Essential oils" }
+      ],
+      "Gorilla habitat": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Essential oils": [
+        { text: "Petroleum byproduct", next: "Petroleum byproduct" },
+        { text: "Aromatherapy", next: "Aromatherapy" }
+      ],
+      "Petroleum byproduct": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Salt", next: "Salt" }
+      ],
+      "Aromatherapy": [
+        { text: "Coffee aroma", next: "Coffee aroma" },
+        { text: "Salt bath", next: "Salt bath" }
+      ],
+      "Coffee aroma": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Salt bath": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Largest member of family": [
+        { text: "Blue whale", next: "Blue whale" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Blue whale": [
+        { text: "Strong swimmer", next: "Strong swimmer" },
+        { text: "Ocean dweller", next: "Ocean dweller" }
+      ],
+      "Strong swimmer": [
+        { text: "Polar Bear", next: "Polar Bear" },
+        { text: "Salmon", next: "Salmon" }
+      ],
+      "Polar Bear": [
+        { text: "Arctic habitat", next: "Arctic habitat" },
+        { text: "Apex predator", next: "Apex predator" }
+      ],
+      "Arctic habitat": [
+        { text: "Petroleum drilling", next: "Petroleum drilling" },
+        { text: "Sea ice", next: "Sea ice" }
+      ],
+      "Petroleum drilling": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Salt water", next: "Salt water" }
+      ],
+      "Salt water": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Sea ice": [
+        { text: "Salt crystals", next: "Salt crystals" },
+        { text: "Climate change", next: "Climate change" }
+      ],
+      "Salt crystals": [
+        { text: "Salt", next: "Salt" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Climate change": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Apex predator": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Orca", next: "Orca" }
+      ],
+      "Orca": [
+        { text: "Salt water habitat", next: "Salt water habitat" },
+        { text: "Intelligent mammal", next: "Intelligent mammal" }
+      ],
+      "Salt water habitat": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Intelligent mammal": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Salmon": [
+        { text: "Upstream swimmer", next: "Upstream swimmer" },
+        { text: "Salt cured", next: "Salt cured" }
+      ],
+      "Upstream swimmer": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Salt cured": [
+        { text: "Salt", next: "Salt" },
+        { text: "Preserved food", next: "Preserved food" }
+      ],
+      "Preserved food": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Ocean dweller": [
+        { text: "Salt water life", next: "Salt water life" },
+        { text: "Deep sea", next: "Deep sea" }
+      ],
+      "Salt water life": [
+        { text: "Salt", next: "Salt" },
+        { text: "Whale oil", next: "Whale oil" }
+      ],
+      "Whale oil": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Lamp fuel", next: "Lamp fuel" }
+      ],
+      "Lamp fuel": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Coffee houses", next: "Coffee houses" }
+      ],
+      "Coffee houses": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Deep sea": [
+        { text: "Oil deposits", next: "Oil deposits" },
+        { text: "Brine", next: "Brine" }
+      ],
+      "Oil deposits": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Salt dome", next: "Salt dome" }
+      ],
+      "Salt dome": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Brine": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      
+      // Mango path → Coffee
+      "Mango": [
+        { text: "Pitted fruit", next: "Pitted fruit" },
+        { text: "Tropical tree", next: "Tropical tree" }
+      ],
+      "Pitted fruit": [
+        { text: "Olive", next: "Olive" },
+        { text: "Avocado", next: "Avocado" }
+      ],
+      "Olive": [
+        { text: "Mediterranean climate", next: "Mediterranean climate" },
+        { text: "Pressed for oil", next: "Pressed for oil" }
+      ],
+      "Mediterranean climate": [
+        { text: "Lemon", next: "Lemon" },
+        { text: "Sea salt", next: "Sea salt" }
+      ],
+      "Lemon": [
+        { text: "High in vitamin C", next: "High in vitamin C" },
+        { text: "Citrus", next: "Citrus" }
+      ],
+      "High in vitamin C": [
+        { text: "Kakadu Plum", next: "Kakadu Plum" },
+        { text: "Prevents scurvy", next: "Prevents scurvy" }
+      ],
+      "Kakadu Plum": [
+        { text: "High in polyphenols", next: "High in polyphenols" },
+        { text: "Australian native", next: "Australian native" }
+      ],
+      "High in polyphenols": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla diet", next: "Gorilla diet" }
+      ],
+      "Gorilla diet": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Australian native": [
+        { text: "Salt lakes", next: "Salt lakes" },
+        { text: "Coffee culture", next: "Coffee culture" }
+      ],
+      "Salt lakes": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Coffee culture": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Prevents scurvy": [
+        { text: "Sailors", next: "Sailors" },
+        { text: "British navy", next: "British navy" }
+      ],
+      "Sailors": [
+        { text: "Salt pork", next: "Salt pork" },
+        { text: "Coffee rations", next: "Coffee rations" }
+      ],
+      "Salt pork": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Coffee rations": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "British navy": [
+        { text: "Salt beef", next: "Salt beef" },
+        { text: "Caribbean trade", next: "Caribbean trade" }
+      ],
+      "Salt beef": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Caribbean trade": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Salt trade", next: "Salt trade" }
+      ],
+      "Salt trade": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Citrus": [
+        { text: "Coffee pairing", next: "Coffee pairing" },
+        { text: "Vitamin rich", next: "Vitamin rich" }
+      ],
+      "Coffee pairing": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Vitamin rich": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Sea salt": [
+        { text: "Salt", next: "Salt" },
+        { text: "Evaporation", next: "Evaporation" }
+      ],
+      "Evaporation": [
+        { text: "Petroleum refining", next: "Petroleum refining" },
+        { text: "Coffee drying", next: "Coffee drying" }
+      ],
+      "Petroleum refining": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Salt", next: "Salt" }
+      ],
+      "Coffee drying": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Salt", next: "Salt" }
+      ],
+      "Pressed for oil": [
+        { text: "Petroleum alternative", next: "Petroleum alternative" },
+        { text: "Cooking oil", next: "Cooking oil" }
+      ],
+      "Petroleum alternative": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Salt", next: "Salt" }
+      ],
+      "Cooking oil": [
+        { text: "Coffee roasting", next: "Coffee roasting" },
+        { text: "Salt seasoning", next: "Salt seasoning" }
+      ],
+      "Coffee roasting": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Salt seasoning": [
+        { text: "Salt", next: "Salt" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Avocado": [
+        { text: "Processed into oil", next: "Processed into oil" },
+        { text: "Superfood", next: "Superfood" }
+      ],
+      "Processed into oil": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Cooking", next: "Cooking" }
+      ],
+      "Cooking": [
+        { text: "Salt", next: "Salt" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Superfood": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Tropical tree": [
+        { text: "Coffee plant", next: "Coffee plant" },
+        { text: "Rainforest canopy", next: "Rainforest canopy" }
+      ],
+      "Coffee plant": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Shade grown", next: "Shade grown" }
+      ],
+      "Shade grown": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Rainforest canopy": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee origin", next: "Coffee origin" }
+      ],
+      "Coffee origin": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      
+      // === ROMAN COOKING BRANCH ===
+      "Common in Roman cooking": [
+        { text: "Olive oil", next: "Olive oil" },
+        { text: "Barley", next: "Barley" }
+      ],
+      "Olive oil": [
+        { text: "From trees", next: "From trees" },
+        { text: "Oil lamps", next: "Oil lamps" }
+      ],
+      "From trees": [
+        { text: "Cinnamon", next: "Cinnamon" },
+        { text: "Rubber", next: "Rubber" }
+      ],
+      "Cinnamon": [
+        { text: "Spice trade", next: "Spice trade" },
+        { text: "Tree bark", next: "Tree bark" }
+      ],
+      "Spice trade": [
+        { text: "Salt roads", next: "Salt roads" },
+        { text: "Coffee route", next: "Coffee route" }
+      ],
+      "Salt roads": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Coffee route": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Tree bark": [
+        { text: "Gorilla food", next: "Gorilla food" },
+        { text: "Medicine", next: "Medicine" }
+      ],
+      "Gorilla food": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Medicine": [
+        { text: "Salt solution", next: "Salt solution" },
+        { text: "Coffee remedy", next: "Coffee remedy" }
+      ],
+      "Salt solution": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Coffee remedy": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Rubber": [
+        { text: "Petroleum products", next: "Petroleum products" },
+        { text: "Tires", next: "Tires" }
+      ],
+      "Petroleum products": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Salt", next: "Salt" }
+      ],
+      "Tires": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Road salt", next: "Road salt" }
+      ],
+      "Road salt": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Oil lamps": [
+        { text: "Petroleum replaced", next: "Petroleum replaced" },
+        { text: "Ancient light", next: "Ancient light" }
+      ],
+      "Petroleum replaced": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Salt", next: "Salt" }
+      ],
+      "Ancient light": [
+        { text: "Salt trade routes", next: "Salt trade routes" },
+        { text: "Coffee houses evening", next: "Coffee houses evening" }
+      ],
+      "Salt trade routes": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Coffee houses evening": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      
+      // Barley path → Salt
+      "Barley": [
+        { text: "From grass", next: "From grass" },
+        { text: "Beer ingredient", next: "Beer ingredient" }
+      ],
+      "From grass": [
+        { text: "Straw", next: "Straw" },
+        { text: "Wheat", next: "Wheat" }
+      ],
+      "Straw": [
+        { text: "Can be woven", next: "Can be woven" },
+        { text: "Animal bedding", next: "Animal bedding" }
+      ],
+      "Can be woven": [
+        { text: "Silk", next: "Silk" },
+        { text: "Cotton", next: "Cotton" }
+      ],
+      "Silk": [
+        { text: "Produced by insects", next: "Produced by insects" },
+        { text: "Luxury trade", next: "Luxury trade" }
+      ],
+      "Produced by insects": [
+        { text: "Honey", next: "Honey" },
+        { text: "Cochineal dye", next: "Cochineal dye" }
+      ],
+      "Honey": [
+        { text: "Salt", next: "Salt" },
+        { text: "Coffee sweetener", next: "Coffee sweetener" }
+      ],
+      "Coffee sweetener": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Salt", next: "Salt" }
+      ],
+      "Cochineal dye": [
+        { text: "Salt mordant", next: "Salt mordant" },
+        { text: "Petroleum dyes", next: "Petroleum dyes" }
+      ],
+      "Salt mordant": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Petroleum dyes": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Salt", next: "Salt" }
+      ],
+      "Luxury trade": [
+        { text: "Salt currency", next: "Salt currency" },
+        { text: "Spice routes", next: "Spice routes" }
+      ],
+      "Salt currency": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum dollars", next: "Petroleum dollars" }
+      ],
+      "Petroleum dollars": [
+        { text: "Petroleum", next: "Petroleum" },
+        { text: "Salt", next: "Salt" }
+      ],
+      "Spice routes": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla territory", next: "Gorilla territory" }
+      ],
+      "Gorilla territory": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee", next: "Coffee" }
+      ],
+      "Cotton": [
+        { text: "Salt bleaching", next: "Salt bleaching" },
+        { text: "Coffee sacks", next: "Coffee sacks" }
+      ],
+      "Salt bleaching": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Coffee sacks": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Animal bedding": [
+        { text: "Gorilla nests", next: "Gorilla nests" },
+        { text: "Stable salt", next: "Stable salt" }
+      ],
+      "Gorilla nests": [
+        { text: "Gorilla", next: "Gorilla" },
+        { text: "Coffee shade", next: "Coffee shade" }
+      ],
+      "Coffee shade": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Stable salt": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Wheat": [
+        { text: "Salt rising bread", next: "Salt rising bread" },
+        { text: "Coffee cake", next: "Coffee cake" }
+      ],
+      "Salt rising bread": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Coffee cake": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      "Beer ingredient": [
+        { text: "Salted snacks", next: "Salted snacks" },
+        { text: "Coffee alternative", next: "Coffee alternative" }
+      ],
+      "Salted snacks": [
+        { text: "Salt", next: "Salt" },
+        { text: "Petroleum", next: "Petroleum" }
+      ],
+      "Coffee alternative": [
+        { text: "Coffee", next: "Coffee" },
+        { text: "Gorilla", next: "Gorilla" }
+      ],
+      
+      // Terminal nodes
+      "Gorilla": [],
+      "Coffee": [],
+      "Petroleum": [],
+      "Salt": []
+    };
+
+    // Clean display name (remove disambiguation suffixes)
+    function displayName(node) {
+      return node.replace(/ \(.*\)$/, '');
+    }
+
+    // Check if node is terminal
+    function isTerminal(node) {
+      return BADGES[node] !== undefined;
+    }
+
+    // Shuffle array
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function Confetti({ show }) {
+      const colors = ['#8acb5e', '#50abf6', '#f7b15b', '#fc97b8', '#c8a9fc', '#73d4da'];
+      const pieces = Array.from({ length: 60 }, (_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        delay: Math.random() * 0.8,
+        duration: 2.5 + Math.random() * 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: 8 + Math.random() * 10,
+        shape: Math.random() > 0.5 ? '50%' : '2px'
+      }));
+      if (!show) return null;
+      return (
+        <div className="confetti-container">
+          {pieces.map(p => (
+            <div key={p.id} className="confetti" style={{
+              left: `${p.left}%`,
+              width: p.size,
+              height: p.size,
+              background: p.color,
+              borderRadius: p.shape,
+              animation: `confettiFall ${p.duration}s ease-out ${p.delay}s forwards`
+            }} />
+          ))}
+        </div>
+      );
+    }
+
+    function App() {
+      const [screen, setScreen] = useState("intro");
+      const [path, setPath] = useState(["Black pepper"]);
+      const [showConfetti, setShowConfetti] = useState(false);
+      const [visibleChainNodes, setVisibleChainNodes] = useState(0);
+
+      const currentNode = path[path.length - 1];
+      const options = GRAPH[currentNode] || [];
+      const isEnd = isTerminal(currentNode);
+      const badge = isEnd ? BADGES[currentNode] : null;
+
+      function startGame() {
+        setPath(["Black pepper"]);
+        setShowConfetti(false);
+        setVisibleChainNodes(0);
+        setScreen("game");
+      }
+
+      function selectOption(opt) {
+        const newPath = [...path, opt.next];
+        setPath(newPath);
+        
+        if (isTerminal(opt.next)) {
+          setScreen("result");
+          setShowConfetti(true);
+          // Animate chain reveal
+          let count = 0;
+          const interval = setInterval(() => {
+            count++;
+            setVisibleChainNodes(count);
+            if (count >= newPath.length) clearInterval(interval);
+          }, 120);
+        }
+      }
+
+      function playAgain() {
+        setPath(["Black pepper"]);
+        setShowConfetti(false);
+        setVisibleChainNodes(0);
+        setScreen("game");
+      }
+
+      const allBadges = Object.values(BADGES);
+
+      return (
+        <div className="root">
+          <div className="wrap">
+            <div className="wordmark">Spark</div>
+
+            {screen === "intro" && (
+              <div className="fade">
+                <div className="intro-card">
+                  <span className="intro-emoji">🔗</span>
+                  <h1 className="intro-title">Build your chain</h1>
+                  <p className="intro-desc">
+                    Start from Black pepper and follow the connections. Each choice opens a new path. Where you end up determines which badge you earn.
+                  </p>
+                  <div className="intro-badges">
+                    {allBadges.map(b => (
+                      <div key={b.id} className="intro-badge">
+                        <span>{b.icon}</span>
+                        <span>{b.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <button className="start-btn" onClick={startGame}>Start building →</button>
+                </div>
+              </div>
+            )}
+
+            {screen === "game" && (
+              <div className="fade" key={currentNode}>
+                <div className="g-header">
+                  <button className="back-btn" onClick={() => setScreen("intro")}>← Back</button>
+                  <span className="step-label">{path.length} link{path.length !== 1 ? 's' : ''}</span>
+                </div>
+
+                <div className="path-display">
+                  <div className="path-label">Your chain</div>
+                  <div className="path-nodes">
+                    {path.map((node, i) => (
+                      <React.Fragment key={i}>
+                        {i > 0 && <span className="path-arrow">→</span>}
+                        <span className={`path-node ${i === path.length - 1 ? 'path-current' : ''}`}>
+                          {displayName(node)}
+                        </span>
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="node-card">
+                  <div className="node-name">{displayName(currentNode)}</div>
+                  <div className="node-q">What connects?</div>
+                </div>
+
+                <div className="options">
+                  {shuffle(options).map((opt, i) => (
+                    <button key={i} className="opt" onClick={() => selectOption(opt)}>
+                      <span>{opt.text}</span>
+                      <span className="opt-arrow">→</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {screen === "result" && badge && (
+              <div className="celebration fade">
+                <Confetti show={showConfetti} />
+                
+                <div className="result-card">
+                  <span className="result-icon">{badge.icon}</span>
+                  <div className="result-congrats">You earned</div>
+                  <div className="result-badge-name">{badge.name}</div>
+                  <div className="result-pill">
+                    <span>✓</span> Badge unlocked
+                  </div>
+                </div>
+
+                <div className="chain-reveal">
+                  <div className="chain-reveal-label">Your path</div>
+                  <div className="chain-reveal-nodes">
+                    {path.map((node, i) => (
+                      <React.Fragment key={i}>
+                        <div className={`chain-reveal-row ${i < visibleChainNodes ? 'visible' : ''}`}>
+                          <div className={`chain-reveal-dot ${i === path.length - 1 ? 'end' : ''}`} />
+                          <div className="chain-reveal-text">{displayName(node)}</div>
+                        </div>
+                        {i < path.length - 1 && i < visibleChainNodes - 1 && (
+                          <div className="chain-reveal-line" />
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="cta-section">
+                  <button className="cta-primary" onClick={playAgain}>
+                    Build a different chain →
+                  </button>
+                  <button className="cta-secondary" onClick={() => {
+                    const text = `I built a ${path.length}-link chain and earned the "${badge.name}" badge! 🔗`;
+                    if (navigator.share) {
+                      navigator.share({ text });
+                    } else {
+                      navigator.clipboard.writeText(text);
+                      alert('Copied to clipboard!');
+                    }
+                  }}>
+                    Share your chain
+                  </button>
+                </div>
+
+                <div className="other-badges">
+                  <div className="other-badges-label">All badges</div>
+                  <div className="other-badges-grid">
+                    {allBadges.map(b => (
+                      <div key={b.id} className={`other-badge ${b.id === badge.id ? 'earned' : ''}`}>
+                        <span>{b.icon}</span>
+                        <span>{b.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
